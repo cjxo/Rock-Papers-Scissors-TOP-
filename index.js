@@ -1,28 +1,39 @@
-console.log("Hallo world")
+let roundOver = false;
+const rockButton = document.querySelector(".rock");
+const paperButton = document.querySelector(".paper");
+const scissorsButton = document.querySelector(".scissors");
+const resetButton = document.querySelector(".reset");
+const scoreDiv = document.querySelector(".score");
+const resultRoundMessageDiv = document.querySelector(".round-result");
+let playerScoreState = 0;
+let computerScoreState = 0;
 
 function
 getComputerChoice() {
-    let result = "Rock";
+    let result = "rock";
 
     let randomReal = Math.random();
     if ((randomReal > 0.33) && (randomReal <= 0.66)) {
-        result = "Paper";        
+        result = "paper";        
     } else if (randomReal > 0.66) {
-        result = "Scissors";
+        result = "rcissors";
     }
 
     return (result);
 }
 
 function
-playRound(playerSelection, computerSelection) {
-    playerSelection = playerSelection.toLowerCase();
-    computerSelection = computerSelection.toLowerCase();
+debugTestComputerChoice() {
+    for (let i = 0; i < 10000; ++i) {
+        console.log(getComputerChoice());
+    }
+}
 
-    let resultMessage = null;
+function processRound(playerSelection, computerSelection) {
+    if (roundOver) return;
 
-    if (playerSelection === computerSelection) {
-        resultMessage = `Tied! ${playerSelection} is even with ${computerSelection}`;
+    if (playerSelection === computerSelection) { 
+        resultRoundMessageDiv.textContent = `Tied! ${playerSelection} is even with ${computerSelection}`;
     } else {
         let win = true;
         switch (playerSelection.charAt(0)) {
@@ -40,30 +51,42 @@ playRound(playerSelection, computerSelection) {
         }
 
         if (win) {
-            resultMessage = `You win! ${playerSelection} wins against ${computerSelection}`;
+            resultRoundMessageDiv.textContent = `You win! ${playerSelection} wins against ${computerSelection}`;
+            ++playerScoreState;
         } else {
-            resultMessage = `You loose! ${computerSelection} beats ${playerSelection}`;
+            ++computerScoreState;
+            resultRoundMessageDiv.textContent = `You loose! ${computerSelection} beats ${playerSelection}`;
+        }
+
+        if (playerScoreState === 5) {
+            scoreDiv.textContent = "Game over! You won!";
+            roundOver = true;
+        } else if (computerScoreState === 5) {
+            scoreDiv.textContent = "Game over! You loose!";
+            roundOver = true;
+        } else {
+            scoreDiv.textContent = `Player: ${playerScoreState}, Comuter: ${computerScoreState}`;
         }
     }
-
-    return (resultMessage);
 }
 
-function
-game() {
-    for (let i = 0; i < 5; ++i) {
-        const playerSelection = prompt("Rock Papers Scissors: ");
-        const computerSelection = getComputerChoice();
-        console.log(`You: ${playerSelection}, Computer: ${computerSelection}`);
-        console.log(playRound(playerSelection, computerSelection));
-    }
-}
+rockButton.addEventListener("click", () => {
+    processRound("rock", getComputerChoice());
+});
 
-function
-debugTestComputerChoice() {
-    for (let i = 0; i < 10000; ++i) {
-        console.log(getComputerChoice());
-    }
-}
+paperButton.addEventListener("click", () => {
+    processRound("paper", getComputerChoice());
+});
 
-game();
+scissorsButton.addEventListener("click", () => {
+    processRound("scissors", getComputerChoice());
+});
+
+resetButton.addEventListener("click", () => {
+    roundOver = false;
+    playerScoreState = computerScoreState = 0;
+    scoreDiv.textContent = "Player: 0, Comuter: 0";
+    resultRoundMessageDiv.textContent = "";
+})
+
+resetButton.click();
